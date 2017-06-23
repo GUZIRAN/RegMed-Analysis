@@ -3,35 +3,31 @@ import matplotlib.pyplot as plt
 import numpy as np 
 import seaborn as ssn
 
+datafile = 'data.txt'     # put the file location here
+savefile = 'heatmap.png'  # where the heatmap should be saved.
 
-data = pd.read_table('REG.TXT')
+data = pd.read_table(datafile)
 header = list(data.columns)
 
 for i in xrange(len(header)):
 	header[i] = header[i].split('.',1)[0]
-#print header
-ct = {x:header.count(x) for x in header}
-gene = ct.keys()
-Tdata = data.T
-Tdata['Gene'] = header
+
+gene = list(set(header))
 DataList = []
 smax = np.nanmax(data.values.astype(np.float64))
 smin = np.nanmin(data.values.astype(np.float64))
 
+
 for i in xrange(len(gene)):
-	DataList.append(Tdata.loc[Tdata.Gene == gene[i]])
+	DataList.append(data.ix[:,[x==gene[i] for x in header]])
 
-plotlist=[]
-for i in xrange(len(gene)):
-	DataList[i]=DataList[i].drop('Gene',1).T
-	DataList[i].index = range(len(DataList[i]))
-	#print gene[i] + 'file shape :' + str (DataList[i].shape)
-	plotlist.append(plt.subplot(1,8,i+1))
-	ssn.heatmap(DataList[i], cbar = False, xticklabels = False, yticklabels = False,vmin = smin,vmax = smax)
+pnum=len(gene)
+fig, axn = plt.subplots(1, pnum, sharex = False)
+cbar_ax = fig.add_axes([.91, .3, .03, .4])
+fig.set_size_inches(18.5, 10.5)
 
-plt.savefig('Heatmap.png')
-
-#now plot the heatmap:
-#plt.pcolor(DataList[0])
-#plt.yticks(np.arange(0.5, len(DataList[0].index), 1), DataList[0].index)
-#plt.xticks(np.arange(0.5, len(DataList[0].columns), 1), DataList[0].columns)
+for i, ax in enumerate(axn.flat):
+	ax.set_title(gene[i])
+	ssn.heatmap(DataList[i], ax = ax, cmap="YlGnBu", cbar_ax = None if i else cbar_ax, cbar = (i == 0), xticklabels = False, yticklabels = False,  vmin = smin,vmax = smax)
+plt.savefig(savefile,dpi=300)
+plt.show()
