@@ -34,6 +34,7 @@ def RegPlot(RegFile,RegImg):
 	plt.show()
 
 
+
 '''
 datafile = 'REG.TXT'     # put the file location here
 savefile = 'heatmap.png'  # where the heatmap should be saved.
